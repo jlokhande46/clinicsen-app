@@ -1,0 +1,94 @@
+/* --- APP SHELL (The Dark Blue Sidebar) --- */
+.layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f1f5f9;
+}
+
+.sidebar {
+  width: 60px; /* Default: Collapsed */
+  background-color: #283593; /* Deep Blue from Screenshot */
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  transition: width 0.3s ease; /* Smooth Animation */
+  overflow: hidden;
+  z-index: 100;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.sidebar:hover {
+  width: 220px; /* Expand on Hover */
+}
+
+/* Logo Area */
+.brand {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+.sidebar:hover .brand { justify-content: flex-start; padding-left: 20px; }
+
+/* Menu Items */
+.nav-menu {
+  display: flex; flex-direction: column; gap: 5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  color: #c5cae9;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.nav-item:hover, .nav-item.active {
+  background-color: #3949ab;
+  color: white;
+  border-left: 4px solid #fb9c0c; /* The Practo Orange Accent */
+}
+
+.nav-icon {
+  min-width: 24px;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-right: 15px;
+}
+
+/* User Profile at Bottom */
+.user-profile {
+  margin-top: auto;
+  padding: 15px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  white-space: nowrap;
+}
+.avatar {
+  width: 32px; height: 32px;
+  background: #fb9c0c;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex: 1;
+  display: flex; /* Allows child pages to split into columns */
+  overflow: hidden;
+}
