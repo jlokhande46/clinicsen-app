@@ -289,3 +289,93 @@ input, select, textarea { color: #333 !important; background-color: #fff !import
   background-color: #fee2e2; 
   color: #ef4444; 
 }
+
+/* ========================================= */
+/* MOBILE RESPONSIVE STYLES (Max Width 768px) */
+/* ========================================= */
+@media (max-width: 768px) {
+
+  /* 1. Layout: Stack Sidebar on Top */
+  .app-container {
+    grid-template-columns: 1fr; /* Remove side-by-side grid */
+    grid-template-rows: auto 1fr; /* Sidebar Auto Height, Content Fills rest */
+  }
+
+  /* 2. Sidebar: Turn into Top Scroll Bar */
+  .sidebar {
+    width: 100%;
+    height: auto;
+    flex-direction: row; /* Horizontal Items */
+    overflow-x: auto; /* Allow scrolling if many items */
+    padding: 10px;
+    align-items: center;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .logo {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    margin-right: 15px;
+  }
+
+  .nav-item {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    white-space: nowrap; /* Don't wrap text */
+  }
+
+  /* 3. Main Content: Remove Margins */
+  .main-content {
+    padding: 15px;
+    margin-left: 0; /* Reset desktop margin */
+    width: 100%;
+  }
+
+  /* 4. Cards & Queues */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr; /* 2 cols instead of 4 */
+  }
+
+  /* 5. Appointment Card Adjustments */
+  .appt-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .appt-meta {
+    margin-bottom: 10px;
+  }
+
+  .appt-actions {
+    width: 100%;
+    justify-content: space-between;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+  }
+
+  /* 6. Forms Stacking */
+  .vitals-grid-container {
+    grid-template-columns: 1fr 1fr; /* 2 items per row */
+  }
+  
+  /* Force Split-Rows (like Dosage) to Stack */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  /* 7. Tables (Scrollable) */
+  .rx-table {
+    display: block;
+    overflow-x: auto; /* Horizontal Scroll for tables */
+    white-space: nowrap;
+  }
+}

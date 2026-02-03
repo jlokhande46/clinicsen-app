@@ -321,7 +321,7 @@ const AppointmentCard = ({ appointment, visitNumber, patient, onSaveRecord, onDe
                         </select>
                      </div>
                   </div>
-                  <div style={{display:'flex', gap:'15px'}}>
+                  <div className="mobile-stack" style={{display:'flex', gap:'15px'}}>
                      <div style={{flex:1.5}}>
                         <label className="practo-input-label">Duration</label>
                         <div style={{display:'flex', gap:'5px'}}>
