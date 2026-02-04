@@ -28,10 +28,10 @@ const Patients = () => {
   }, [activeQueue]); // Re-run when tab changes
 
   const fetchQueueData = async () => {
-    let url = '${API_URL}/patients'; // Default: Recent (All sorted by created_at)
+    let url = `${API_URL}/patients`; // Default: Recent (All sorted by created_at)
     
     if (activeQueue === 'today') {
-      url = '${API_URL}/queue/today';
+      url = `${API_URL}/queue/today`;
     }
 
     try {
@@ -95,15 +95,15 @@ const Patients = () => {
     let body;
 
     if (type === 'vitals') {
-      url = '${API_URL}/vitals';
+      url = `${API_URL}/vitals`;
       body = { ...payload, appointment_id: appointmentId };
     } 
     else if (type === 'notes') {
-      url = '${API_URL}/clinical-notes';
+      url = `${API_URL}/clinical-notes`;
       body = { ...payload, appointment_id: appointmentId };
     } 
     else if (type === 'rx') {
-      url = '${API_URL}/prescriptions';
+      url = `${API_URL}/prescriptions`;
       body = payload.map(drug => ({ ...drug, appointment_id: appointmentId }));
     }
 
@@ -119,7 +119,7 @@ const Patients = () => {
   const handleSavePatient = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('${API_URL}/patients', {
+      const res = await fetch(`${API_URL}/patients`, {
         method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formData)
       });
       const data = await res.json();

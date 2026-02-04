@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import Patients from './pages/Patients';
+import { API_URL } from './config';
 import './App.css'; 
 
 // 1. The Logic Component (Handles Routing)
