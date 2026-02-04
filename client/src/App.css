@@ -1,3 +1,4 @@
+/* client/src/App.css */
 :root {
   --primary-color: #007bff;
   --secondary-color: #28a745;
@@ -6,24 +7,32 @@
   --card-bg: #ffffff;
 }
 
+/* 1. Reset Body to prevent scroll overflow */
 body {
   margin: 0;
+  padding: 0;
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
+  min-height: 100vh;
+  width: 100vw;
+  overflow-x: hidden; /* Crucial: Stops side-scrolling */
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
 }
 
+/* 2. Login Container - Responsive Width */
 .login-container {
   background: var(--card-bg);
-  padding: 2.5rem;
+  padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
+  
+  /* Mobile First Sizing */
+  width: 90%; 
+  max-width: 400px; /* Won't get bigger than this on desktop */
+  margin: 20px auto;
+  box-sizing: border-box; /* Ensures padding doesn't add to width */
 }
 
 h2 {
@@ -76,10 +85,10 @@ label {
 
 input {
   width: 100%;
-  padding: 12px;
+  padding: 14px; /* Slightly larger touch target */
   border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 16px; /* Prevents iOS zoom on focus */
   box-sizing: border-box;
   transition: border-color 0.2s;
 }
@@ -106,6 +115,31 @@ input:focus {
   opacity: 0.9;
 }
 
-/* Dynamic Button Colors */
-.btn-doc { background-color: var(--primary-color); }
-.btn-recep { background-color: var(--secondary-color); }
+/* ========================================= */
+/* GLOBAL PLACEHOLDER FIX                    */
+/* ========================================= */
+
+/* Chrome, Firefox, Opera, Safari 10.1+ */
+::placeholder {
+  color: #a0aec0 !important; /* Light Grey */
+  opacity: 1; /* Firefox default is lower, this ensures our color wins */
+  font-weight: 400; /* Ensures it looks thinner than typed text */
+}
+
+/* Internet Explorer 10-11 */
+:-ms-input-placeholder {
+  color: #a0aec0 !important;
+  font-weight: 400;
+}
+
+/* Microsoft Edge */
+::-ms-input-placeholder {
+  color: #a0aec0 !important;
+  font-weight: 400;
+}
+
+/* Optional: Make it disappear slightly when you click to type */
+input:focus::placeholder {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
