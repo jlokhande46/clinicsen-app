@@ -2,12 +2,12 @@
 :root {
   --primary-color: #007bff;
   --secondary-color: #28a745;
-  --bg-color: #f4f7f6;
+  --bg-color: #f5f6f8;
   --text-color: #333;
   --card-bg: #ffffff;
 }
 
-/* 1. Reset Body to prevent scroll overflow */
+/* 1. Base Layout */
 body {
   margin: 0;
   padding: 0;
@@ -16,23 +16,60 @@ body {
   min-height: 100vh;
   width: 100vw;
   overflow-x: hidden; /* Crucial: Stops side-scrolling */
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-/* 2. Login Container - Responsive Width */
-.login-container {
+/* 2. Login Shell */
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  box-sizing: border-box;
+}
+
+.login-card {
+  width: min(980px, 100%);
   background: var(--card-bg);
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  
-  /* Mobile First Sizing */
-  width: 90%; 
-  max-width: 400px; /* Won't get bigger than this on desktop */
-  margin: 20px auto;
-  box-sizing: border-box; /* Ensures padding doesn't add to width */
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  overflow: hidden;
+}
+
+.login-brand {
+  background: #f8fafc;
+  padding: 48px 40px;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login-title {
+  color: #1f2937;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.login-subtitle {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* 3. Login Form Container */
+.login-container {
+  padding: 40px 36px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 h2 {
@@ -47,7 +84,7 @@ h2 {
   background: #e9ecef;
   padding: 4px;
   border-radius: 8px;
-  margin-bottom: 2rem;
+  margin-bottom: 4px;
 }
 
 .role-btn {
@@ -70,44 +107,45 @@ h2 {
 }
 
 /* Form Styles */
-.form-group {
-  margin-bottom: 1rem;
+.login-container .form-group {
+  margin-bottom: 16px;
   text-align: left;
 }
 
-label {
+.login-container label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  color: #555;
-  font-weight: 500;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: #4b5563;
+  font-weight: 600;
 }
 
-input {
+.login-container input {
   width: 100%;
-  padding: 14px; /* Slightly larger touch target */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px; /* Prevents iOS zoom on focus */
+  padding: 12px 14px !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 8px !important;
+  font-size: 15px;
   box-sizing: border-box;
   transition: border-color 0.2s;
+  background: #fff;
 }
 
-input:focus {
+.login-container input:focus {
   outline: none;
   border-color: var(--primary-color);
 }
 
 .login-btn {
   width: 100%;
-  padding: 14px;
+  padding: 12px 16px;
   border: none;
   border-radius: 8px;
   color: white;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 1rem;
+  margin-top: 8px;
   transition: background 0.2s;
 }
 
@@ -120,26 +158,41 @@ input:focus {
 /* ========================================= */
 
 /* Chrome, Firefox, Opera, Safari 10.1+ */
-::placeholder {
+.login-container ::placeholder {
   color: #a0aec0 !important; /* Light Grey */
   opacity: 1; /* Firefox default is lower, this ensures our color wins */
   font-weight: 400; /* Ensures it looks thinner than typed text */
 }
 
 /* Internet Explorer 10-11 */
-:-ms-input-placeholder {
+.login-container :-ms-input-placeholder {
   color: #a0aec0 !important;
   font-weight: 400;
 }
 
 /* Microsoft Edge */
-::-ms-input-placeholder {
+.login-container ::-ms-input-placeholder {
   color: #a0aec0 !important;
   font-weight: 400;
 }
 
 /* Optional: Make it disappear slightly when you click to type */
-input:focus::placeholder {
+.login-container input:focus::placeholder {
   opacity: 0.5;
   transition: opacity 0.2s ease;
+}
+
+/* 4. Responsive */
+@media (max-width: 900px) {
+  .login-card {
+    grid-template-columns: 1fr;
+  }
+  .login-brand {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 32px 28px;
+  }
+  .login-container {
+    padding: 32px 28px;
+  }
 }

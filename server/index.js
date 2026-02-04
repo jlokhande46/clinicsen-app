@@ -17,6 +17,31 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// --- SIMPLE ROLE GUARD (Header-based) ---
+const patientFieldsForReceptionist = 'id, full_name, age, gender, phone_number, address_street, address_city, email';
+const filterPatientForReceptionist = (patient) => ({
+  id: patient.id,
+  full_name: patient.full_name,
+  age: patient.age,
+  gender: patient.gender,
+  phone_number: patient.phone_number,
+  address_street: patient.address_street,
+  address_city: patient.address_city,
+  email: patient.email
+});
+
+const getUserRole = (req) => {
+  const rawRole = req.header('x-user-role') || req.query.role || req.body?.role;
+  const role = String(rawRole || '').toUpperCase();
+  return role === 'DOCTOR' ? 'DOCTOR' : 'RECEPTIONIST';
+};
+
+// Attach role to every request (default to least privilege)
+app.use((req, res, next) => {
+  req.userRole = getUserRole(req);
+  next();
+});
+
 // ==========================================
 // ============== ROUTES ====================
 // ==========================================
@@ -62,9 +87,10 @@ app.post('/login', async (req, res) => {
 
 // 1. GET ALL PATIENTS (Recent First)
 app.get('/patients', async (req, res) => {
+  const selectFields = req.userRole === 'DOCTOR' ? '*' : patientFieldsForReceptionist;
   const { data, error } = await supabase
     .from('patients')
-    .select('*')
+    .select(selectFields)
     .order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
@@ -73,9 +99,10 @@ app.get('/patients', async (req, res) => {
 // 2. SEARCH PATIENTS
 app.get('/patients/search', async (req, res) => {
   const { query } = req.query;
+  const selectFields = req.userRole === 'DOCTOR' ? '*' : patientFieldsForReceptionist;
   const { data, error } = await supabase
     .from('patients')
-    .select('*')
+    .select(selectFields)
     .ilike('full_name', `%${query}%`);
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
@@ -88,12 +115,26 @@ app.post('/patients', async (req, res) => {
     .insert([req.body])
     .select();
   if (error) return res.status(500).json({ success: false, message: error.message });
-  res.json({ success: true, patient: data[0] });
+  const patient = data[0];
+  res.json({ 
+    success: true, 
+    patient: req.userRole === 'DOCTOR' ? patient : filterPatientForReceptionist(patient)
+  });
 });
 
 // 4. GET PATIENT HISTORY (Visits + Data)
 app.get('/patient-history/:id', async (req, res) => {
   const { id } = req.params;
+  if (req.userRole !== 'DOCTOR') {
+    const { data, error } = await supabase
+      .from('appointments')
+      .select('id, appointment_date')
+      .eq('patient_id', id)
+      .order('appointment_date', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(data);
+  }
+
   const { data, error } = await supabase
     .from('appointments')
     .select(`
@@ -111,6 +152,9 @@ app.get('/patient-history/:id', async (req, res) => {
 
 // 5. START NEW VISIT
 app.post('/appointments', async (req, res) => {
+  if (req.userRole !== 'DOCTOR') {
+    return res.status(403).json({ success: false, message: 'Access denied' });
+  }
   const { data, error } = await supabase
     .from('appointments')
     .insert([req.body])
@@ -121,6 +165,9 @@ app.post('/appointments', async (req, res) => {
 
 // 6. SAVE VITALS
 app.post('/vitals', async (req, res) => {
+  if (req.userRole !== 'DOCTOR') {
+    return res.status(403).json({ error: 'Access denied' });
+  }
   const { error } = await supabase.from('vitals').insert([req.body]);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -128,6 +175,9 @@ app.post('/vitals', async (req, res) => {
 
 // 7. SAVE CLINICAL NOTES
 app.post('/clinical-notes', async (req, res) => {
+  if (req.userRole !== 'DOCTOR') {
+    return res.status(403).json({ error: 'Access denied' });
+  }
   const { error } = await supabase.from('clinical_notes').insert([req.body]);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -135,6 +185,9 @@ app.post('/clinical-notes', async (req, res) => {
 
 // 8. SAVE PRESCRIPTIONS (Handles Array of Drugs)
 app.post('/prescriptions', async (req, res) => {
+  if (req.userRole !== 'DOCTOR') {
+    return res.status(403).json({ error: 'Access denied' });
+  }
   const { error } = await supabase.from('prescriptions').insert(req.body);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true });
@@ -147,12 +200,13 @@ app.get('/queue/today', async (req, res) => {
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999);
 
+  const patientSelect = req.userRole === 'DOCTOR'
+    ? 'appointment_date, patients (*)'
+    : `appointment_date, patients (${patientFieldsForReceptionist})`;
+
   const { data, error } = await supabase
     .from('appointments')
-    .select(`
-      appointment_date,
-      patients (*)
-    `)
+    .select(patientSelect)
     .gte('appointment_date', todayStart.toISOString())
     .lte('appointment_date', todayEnd.toISOString())
     .order('appointment_date', { ascending: false }); // Newest First
@@ -177,6 +231,9 @@ app.get('/queue/today', async (req, res) => {
 
 // 10. DELETE APPOINTMENT (Safe Delete)
 app.delete('/appointments/:id', async (req, res) => {
+  if (req.userRole !== 'DOCTOR') {
+    return res.status(403).json({ success: false, message: 'Access denied' });
+  }
   const { id } = req.params;
 
   // Check for existing data first

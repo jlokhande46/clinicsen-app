@@ -6,6 +6,12 @@ import { API_URL } from '../config';
 
 const Patients = () => {
   const { user } = useAuth();
+  const isDoctor = user?.role === 'DOCTOR';
+  const roleHeader = { 'X-User-Role': user?.role || 'RECEPTIONIST' };
+  const fetchWithRole = (url, options = {}) => {
+    const headers = { ...roleHeader, ...(options.headers || {}) };
+    return fetch(url, { ...options, headers });
+  };
   
   // Data State
   const [patients, setPatients] = useState([]); // The Queue List
@@ -35,7 +41,7 @@ const Patients = () => {
     }
 
     try {
-      const res = await fetch(url);
+      const res = await fetchWithRole(url);
       const data = await res.json();
       
       if (Array.isArray(data)) {
@@ -59,7 +65,7 @@ const Patients = () => {
 
   const fetchHistory = async (id) => {
     try {
-      const res = await fetch(`${API_URL}/patient-history/${id}`);
+      const res = await fetchWithRole(`${API_URL}/patient-history/${id}`);
       const data = await res.json();
       setHistory(data);
     } catch (err) { console.error("Failed to load history", err); }
@@ -67,9 +73,10 @@ const Patients = () => {
 
   // --- START NEW VISIT ---
   const startNewVisit = async () => {
+    if (!isDoctor) return;
     if (!selectedPatient) return;
     try {
-      const res = await fetch(`${API_URL}/appointments`, {
+      const res = await fetchWithRole(`${API_URL}/appointments`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ 
@@ -91,6 +98,7 @@ const Patients = () => {
 
   // --- SAVE RECORD ---
   const handleSaveRecord = async (type, appointmentId, payload) => {
+    if (!isDoctor) return;
     let url = '';
     let body;
 
@@ -108,7 +116,7 @@ const Patients = () => {
     }
 
     try {
-      await fetch(url, {
+      await fetchWithRole(url, {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
       });
       fetchHistory(selectedPatient.id); 
@@ -119,7 +127,7 @@ const Patients = () => {
   const handleSavePatient = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`${API_URL}/patients`, {
+      const res = await fetchWithRole(`${API_URL}/patients`, {
         method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formData)
       });
       const data = await res.json();
@@ -137,10 +145,11 @@ const Patients = () => {
 
   // --- NEW: DELETE HANDLER ---
   const handleDeleteVisit = async (appointmentId) => {
+    if (!isDoctor) return;
     if (!window.confirm("Are you sure you want to cancel this empty visit?")) return;
 
     try {
-      const res = await fetch(`${API_URL}/appointments/${appointmentId}`, {
+      const res = await fetchWithRole(`${API_URL}/appointments/${appointmentId}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -219,19 +228,28 @@ const Patients = () => {
           <>
             <div className="patient-header">
                <div>
-                 <div className="ph-name">{selectedPatient.full_name} <span style={{fontSize:'0.9rem', color:'#999'}}>(ID: {selectedPatient.id.slice(0,6)})</span></div>
-                 <div className="ph-meta">+91 {selectedPatient.phone_number} • {selectedPatient.gender}, {selectedPatient.age} Years • {selectedPatient.blood_group || '-'}</div>
+                 <div className="ph-name">{selectedPatient.full_name} <span style={{fontSize:'0.9rem', color:'#999'}}>(ID: {String(selectedPatient.id).slice(0,6)})</span></div>
+                 <div className="ph-meta">
+                   +91 {selectedPatient.phone_number} • {selectedPatient.gender}, {selectedPatient.age} Years
+                   {isDoctor && ` • ${selectedPatient.blood_group || '-'}`}
+                 </div>
                </div>
-               <button className="btn-cancel">Edit Profile</button>
+               {isDoctor && <button className="btn-cancel">Edit Profile</button>}
             </div>
             
             <div style={{padding:'30px', background:'#fbfbfb', flex:1, overflowY:'auto'}}>
                
-               <div style={{textAlign:'right', marginBottom:'20px'}}>
-                  <button className="btn-orange" onClick={startNewVisit}>+ Start New Visit</button>
-               </div>
+               {isDoctor && (
+                 <div style={{textAlign:'right', marginBottom:'20px'}}>
+                    <button className="btn-orange" onClick={startNewVisit}>+ Start New Visit</button>
+                 </div>
+               )}
 
-               {history.length === 0 && <div style={{textAlign:'center', color:'#999', marginTop:'50px'}}>No visits found. Click "Start New Visit" to begin.</div>}
+               {history.length === 0 && (
+                 <div style={{textAlign:'center', color:'#999', marginTop:'50px'}}>
+                   {isDoctor ? 'No visits found. Click "Start New Visit" to begin.' : 'No visits found.'}
+                 </div>
+               )}
                
                {history.map((appt, index) => {
                  const visitNum = history.length - index;
@@ -241,6 +259,7 @@ const Patients = () => {
                       appointment={appt} 
                       visitNumber={visitNum} 
                       patient={selectedPatient}
+                      role={user?.role}
                       onSaveRecord={handleSaveRecord}
                       onDelete={handleDeleteVisit}
                    />
@@ -254,10 +273,12 @@ const Patients = () => {
       </div>
 
       {/* 3. WIDGETS */}
-      <div style={{width:'240px', borderLeft:'1px solid #eee', background:'#fff', padding:'20px'}}>
-         <div style={{fontSize:'0.8rem', fontWeight:'bold', color:'#999', marginBottom:'10px'}}>MEDICAL HISTORY</div>
-         <div style={{fontSize:'0.85rem', color:'#2196f3', cursor:'pointer'}}>+ Click to Add</div>
-      </div>
+      {isDoctor && (
+        <div style={{width:'240px', borderLeft:'1px solid #eee', background:'#fff', padding:'20px'}}>
+           <div style={{fontSize:'0.8rem', fontWeight:'bold', color:'#999', marginBottom:'10px'}}>MEDICAL HISTORY</div>
+           <div style={{fontSize:'0.85rem', color:'#2196f3', cursor:'pointer'}}>+ Click to Add</div>
+        </div>
+      )}
 
       {/* 4. MODAL */}
       {showModal && (

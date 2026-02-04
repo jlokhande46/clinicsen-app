@@ -47,48 +47,52 @@ const AppContent = () => {
 
   // IF NOT LOGGED IN: Show Login Form
   return (
-    <div className="login-container">
-      <div style={{textAlign:'center', marginBottom:'30px'}}>
-        <h1 style={{color:'#283593', margin:0}}>🏥 ClinicSen</h1>
-        <p style={{color:'#666', marginTop:'5px'}}>Medical Practice Management</p>
-      </div>
-      
-      <div className="role-toggle">
-        <button type="button" className={`role-btn ${role === 'DOCTOR' ? 'active' : ''}`} onClick={() => setRole('DOCTOR')}>Doctor</button>
-        <button type="button" className={`role-btn ${role === 'RECEPTIONIST' ? 'active' : ''}`} onClick={() => setRole('RECEPTIONIST')}>Receptionist</button>
-      </div>
-
-      <form onSubmit={handleLogin}>
-        <div className="form-group">
-          <label>Username</label>
-          <input 
-            type="text" 
-            placeholder="Enter ID" 
-            value={username} 
-            onChange={e => setUsername(e.target.value)} 
-            required 
-          />
-        </div>
-        
-        <div className="form-group">
-          <label>Password</label>
-          <input 
-            type="password" 
-            placeholder="Enter Password" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            required 
-          />
+    <div className="login-shell">
+      <div className="login-card">
+        <div className="login-brand">
+          <h1 className="login-title">🏥 ClinicSen</h1>
+          <p className="login-subtitle">Medical Practice Management</p>
         </div>
 
-        <button 
-          type="submit" 
-          className="login-btn"
-          style={{backgroundColor: role === 'DOCTOR' ? '#2563eb' : '#059669'}}
-        >
-          Login as {role === 'DOCTOR' ? 'Doctor' : 'Receptionist'}
-        </button>
-      </form>
+        <div className="login-container">
+          <div className="role-toggle">
+            <button type="button" className={`role-btn ${role === 'DOCTOR' ? 'active' : ''}`} onClick={() => setRole('DOCTOR')}>Doctor</button>
+            <button type="button" className={`role-btn ${role === 'RECEPTIONIST' ? 'active' : ''}`} onClick={() => setRole('RECEPTIONIST')}>Receptionist</button>
+          </div>
+
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label>Username</label>
+              <input 
+                type="text" 
+                placeholder="Enter ID" 
+                value={username} 
+                onChange={e => setUsername(e.target.value)} 
+                required 
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Password</label>
+              <input 
+                type="password" 
+                placeholder="Enter Password" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                required 
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="login-btn"
+              style={{backgroundColor: role === 'DOCTOR' ? '#2563eb' : '#059669'}}
+            >
+              Login as {role === 'DOCTOR' ? 'Doctor' : 'Receptionist'}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

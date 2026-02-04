@@ -7,10 +7,11 @@ const Icons = {
   // Trash removed completely
 };
 
-const AppointmentCard = ({ appointment, visitNumber, patient, onSaveRecord, onDelete }) => {
+const AppointmentCard = ({ appointment, visitNumber, patient, role, onSaveRecord, onDelete }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [activeForm, setActiveForm] = useState(null); 
   const menuRef = useRef(null);
+  const canViewClinical = role === 'DOCTOR';
 
   // --- FORM STATES ---
   const [vitalsData, setVitalsData] = useState({ 
@@ -31,9 +32,9 @@ const AppointmentCard = ({ appointment, visitNumber, patient, onSaveRecord, onDe
   });
 
   // Check Existence
-  const hasVitals = appointment.vitals && appointment.vitals.length > 0;
-  const hasNotes = appointment.clinical_notes && appointment.clinical_notes.length > 0;
-  const hasRx = appointment.prescriptions && appointment.prescriptions.length > 0;
+  const hasVitals = canViewClinical && appointment.vitals && appointment.vitals.length > 0;
+  const hasNotes = canViewClinical && appointment.clinical_notes && appointment.clinical_notes.length > 0;
+  const hasRx = canViewClinical && appointment.prescriptions && appointment.prescriptions.length > 0;
   
   // Safe Delete Check (Only if empty)
   const isEmptyVisit = !hasVitals && !hasNotes && !hasRx;
@@ -189,21 +190,25 @@ const AppointmentCard = ({ appointment, visitNumber, patient, onSaveRecord, onDe
         
         <div className="appt-actions">
            
-           <span className="action-icon" title="Print Prescription" onClick={handlePrint}>{Icons.Print}</span>
+           {canViewClinical && (
+             <span className="action-icon" title="Print Prescription" onClick={handlePrint}>{Icons.Print}</span>
+           )}
            
-           <div style={{position:'relative'}} ref={menuRef}>
-             <button className="btn-add-record" onClick={() => setShowMenu(!showMenu)}>Add Records ▼</button>
-             {showMenu && (
-               <div className="record-dropdown">
-                 <button className="dropdown-item" disabled={hasVitals} onClick={()=>{setActiveForm('vitals'); setShowMenu(false)}}>Vital Signs {hasVitals && '✓'}</button>
-                 <button className="dropdown-item" disabled={hasNotes} onClick={()=>{setActiveForm('notes'); setShowMenu(false)}}>Clinical Notes {hasNotes && '✓'}</button>
-                 <button className="dropdown-item" disabled={hasRx} onClick={()=>{setActiveForm('rx'); setShowMenu(false)}}>Prescriptions {hasRx && '✓'}</button>
-               </div>
-             )}
-           </div>
+           {canViewClinical && (
+             <div style={{position:'relative'}} ref={menuRef}>
+               <button className="btn-add-record" onClick={() => setShowMenu(!showMenu)}>Add Records ▼</button>
+               {showMenu && (
+                 <div className="record-dropdown">
+                   <button className="dropdown-item" disabled={hasVitals} onClick={()=>{setActiveForm('vitals'); setShowMenu(false)}}>Vital Signs {hasVitals && '✓'}</button>
+                   <button className="dropdown-item" disabled={hasNotes} onClick={()=>{setActiveForm('notes'); setShowMenu(false)}}>Clinical Notes {hasNotes && '✓'}</button>
+                   <button className="dropdown-item" disabled={hasRx} onClick={()=>{setActiveForm('rx'); setShowMenu(false)}}>Prescriptions {hasRx && '✓'}</button>
+                 </div>
+               )}
+             </div>
+           )}
 
            {/* === DELETE 'X' (PLACED AFTER ADD RECORDS) === */}
-           {isEmptyVisit && (
+           {canViewClinical && isEmptyVisit && (
              <div 
                className="btn-action-delete" 
                onClick={() => onDelete(appointment.id)} 
@@ -264,7 +269,7 @@ const AppointmentCard = ({ appointment, visitNumber, patient, onSaveRecord, onDe
       </div>
 
       {/* --- FORMS --- */}
-      {activeForm === 'vitals' && (
+      {canViewClinical && activeForm === 'vitals' && (
         <div className="chart-form-box">
            <div className="cyan-banner"><span>Add Vitals</span><span style={{cursor:'pointer'}} onClick={()=>setActiveForm(null)}>✖</span></div>
            <div className="form-content">
@@ -281,7 +286,7 @@ const AppointmentCard = ({ appointment, visitNumber, patient, onSaveRecord, onDe
         </div>
       )}
 
-      {activeForm === 'notes' && (
+      {canViewClinical && activeForm === 'notes' && (
          <div className="chart-form-box">
             <div className="cyan-banner"><span>Clinical Notes</span><span style={{cursor:'pointer'}} onClick={()=>setActiveForm(null)}>✖</span></div>
             <div className="form-content notes-grid">
@@ -294,7 +299,7 @@ const AppointmentCard = ({ appointment, visitNumber, patient, onSaveRecord, onDe
          </div>
       )}
 
-      {activeForm === 'rx' && (
+      {canViewClinical && activeForm === 'rx' && (
          <div className="chart-form-box">
             <div className="cyan-banner"><span>Add Prescriptions</span><span style={{cursor:'pointer'}} onClick={()=>setActiveForm(null)}>✖</span></div>
             <div className="form-content">
