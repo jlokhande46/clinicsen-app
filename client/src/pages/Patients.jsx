@@ -69,7 +69,7 @@ const Patients = () => {
   const startNewVisit = async () => {
     if (!selectedPatient) return;
     try {
-      const res = await fetch('${API_URL}/appointments', {
+      const res = await fetch(`${API_URL}/appointments`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ 
