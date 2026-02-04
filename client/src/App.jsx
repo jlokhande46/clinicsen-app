@@ -17,7 +17,7 @@ const AppContent = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://localhost:8000/login', {
+      const res = await fetch('${API_URL}/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, role }),
@@ -48,7 +48,7 @@ const AppContent = () => {
   return (
     <div className="login-container">
       <div style={{textAlign:'center', marginBottom:'30px'}}>
-        <h1 style={{color:'#283593', margin:0}}>🏥 ClinicOS</h1>
+        <h1 style={{color:'#283593', margin:0}}>🏥 ClinicSen</h1>
         <p style={{color:'#666', marginTop:'5px'}}>Medical Practice Management</p>
       </div>
       

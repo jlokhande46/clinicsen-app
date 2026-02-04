@@ -10,7 +10,7 @@ const Layout = ({ children, activeTab, setActiveTab }) => {
       <aside className="sidebar">
         <div className="brand">
            <span className="nav-icon">🏥</span> 
-           <span>ClinicOS</span>
+           <span>ClinicSen</span>
         </div>
         
         <nav className="nav-menu">
