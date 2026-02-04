@@ -21,6 +21,18 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // ============== ROUTES ====================
 // ==========================================
 
+// 0. LOGIN ROUTE (Simple Passcode Check)
+app.post('/login', async (req, res) => {
+  const { passcode } = req.body;
+  
+  // Replace '1234' with whatever passcode you want to use
+  if (passcode === '1234') { 
+    return res.json({ success: true, token: 'fake-jwt-token' });
+  } else {
+    return res.status(401).json({ success: false, message: 'Invalid Passcode' });
+  }
+});
+
 // 1. GET ALL PATIENTS (Recent First)
 app.get('/patients', async (req, res) => {
   const { data, error } = await supabase
