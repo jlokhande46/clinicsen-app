@@ -21,15 +21,42 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // ============== ROUTES ====================
 // ==========================================
 
-// 0. LOGIN ROUTE (Simple Passcode Check)
+// 0. REAL DATABASE LOGIN
 app.post('/login', async (req, res) => {
-  const { passcode } = req.body;
-  
-  // Replace '1234' with whatever passcode you want to use
-  if (passcode === '1234') { 
-    return res.json({ success: true, token: 'fake-jwt-token' });
+  // 1. Get username and password from the Frontend
+  const { username, password } = req.body;
+
+  console.log("Login attempt for:", username); // Debugging log
+
+  // 2. Query the 'users' table
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  // 3. Check if user exists
+  if (error || !data) {
+    console.log("User not found or error:", error);
+    return res.status(401).json({ success: false, message: 'User not found' });
+  }
+
+  // 4. Check Password (Matching 'password_hash' column)
+  // NOTE: This checks if the password typed matches the string in your DB
+  if (data.password_hash === password) {
+    
+    // LOGIN SUCCESS!
+    return res.json({ 
+      success: true, 
+      user: { 
+        username: data.username, 
+        role: data.role // This will be 'DOCTOR' or 'RECEPTIONIST'
+      } 
+    });
+
   } else {
-    return res.status(401).json({ success: false, message: 'Invalid Passcode' });
+    // LOGIN FAILED
+    return res.status(401).json({ success: false, message: 'Invalid Password' });
   }
 });
 
